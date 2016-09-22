@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.n52.series.db.beans.PlatformEntity" table="`procedure`">
+        <id name="pkid" type="long">
+            <column name="procedureid" />
+            <generator class="assigned" />
+        </id>
+
+        <property name="domainId" column="identifier" type="string" insert="false" update="false"/>
+        <property name="name" column="name" type="string" />
+
+        <property formula="'T'" name="mobile" type="org.hibernate.type.TrueFalseType"/>
+        <property formula="'T'" name="insitu" type="org.hibernate.type.TrueFalseType"/>
+
+    </class>
+</hibernate-mapping>

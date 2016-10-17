@@ -1,0 +1,19 @@
+fotoquest-tomcat:
+  container_name: fotoquest-tomcat
+  image:  davidcaste/alpine-tomcat
+  ports:
+    - "9080:9080"
+  volumes:
+    - ../spi-impl/series/fotoquest/fotoquest-webapp/target/fotoquest-webapp:/opt/tomcat/webapps/fotoquest-webapp
+  command: /opt/tomcat/bin/catalina.sh start
+  
+fotoquest-nginx:
+  container_name: fotoquest-nginx
+  image: nginx
+  links:
+    - fotoquest-tomcat
+  ports:
+    - "8080:80"
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+  command: /bin/bash -c "nginx -g 'daemon off;'"

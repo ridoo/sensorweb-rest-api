@@ -99,6 +99,14 @@ public class DescribableEntity {
     public void setTranslations(Set<I18nEntity> translations) {
         this.translations = translations;
     }
+    
+    public ServiceEntity getService() {
+        return service;
+    }
+
+    public void setService(ServiceEntity service) {
+        this.service = service;
+    }
 
     public String getNameI18n(String locale) {
         if (noTranslationAvailable(locale)) {

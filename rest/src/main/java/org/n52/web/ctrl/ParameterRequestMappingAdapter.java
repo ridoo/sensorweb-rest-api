@@ -31,13 +31,19 @@ package org.n52.web.ctrl;
 
 import java.util.Collections;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
+import org.n52.io.request.IoParameters;
 
 import org.n52.io.request.Parameters;
+import org.n52.io.request.QueryParameters;
 import org.n52.io.response.ParameterOutput;
+import org.n52.io.response.pagination.OffsetBasedPagination;
+import org.n52.io.response.pagination.Paginated;
+import org.n52.series.spi.srv.CountingMetadataService;
 import org.n52.series.spi.srv.RawFormats;
 import org.n52.web.common.RequestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -51,11 +57,28 @@ import org.springframework.web.servlet.ModelAndView;
 })
 public abstract class ParameterRequestMappingAdapter<T extends ParameterOutput> extends ParameterController<T> {
 
+    @Autowired
+    @Qualifier("metadataService")
+    private CountingMetadataService counter;
+
     @Override
     @RequestMapping(path = "")
-    public ModelAndView getCollection(@RequestHeader(value = Parameters.HttpHeader.ACCEPT_LANGUAGE) String locale,
+    public ModelAndView getCollection(HttpServletResponse response,
+                                      @RequestHeader(value = Parameters.HttpHeader.ACCEPT_LANGUAGE) String locale,
                                       @RequestParam MultiValueMap<String, String> query) {
-        return super.getCollection(locale, addHrefBase(query));
+        String lim = "limit";
+        String off = "offset";
+        IoParameters queryMap = QueryParameters.createFromQuery(query);
+        queryMap = IoParameters.ensureBackwardsCompatibility(queryMap);
+        if (queryMap.containsParameter(lim) || queryMap.containsParameter(off)) {
+            Integer elementcount = this.getElementCount(queryMap.removeAllOf(lim).removeAllOf(off));
+            if (elementcount != -1) {
+                OffsetBasedPagination obp = new OffsetBasedPagination(queryMap.getOffset(), queryMap.getLimit());
+                Paginated<T> paginated = new Paginated(obp, elementcount.longValue());
+                this.addPagingHeaders(this.getCollectionPath(this.getHrefBase()), response, paginated);
+            }
+        }
+        return super.getCollection(null, locale, addHrefBase(query));
     }
 
     @Override
@@ -88,9 +111,38 @@ public abstract class ParameterRequestMappingAdapter<T extends ParameterOutput> 
     }
 
     protected MultiValueMap<String, String> addHrefBase(MultiValueMap<String, String> query) {
-        String externalUrl = getExternalUrl();
-        String hrefBase = RequestUtils.resolveQueryLessRequestUrl(externalUrl);
-        query.put(Parameters.HREF_BASE, Collections.singletonList(hrefBase));
+        query.put(Parameters.HREF_BASE, Collections.singletonList(getHrefBase()));
         return query;
+    }
+
+    private String getHrefBase() {
+        return RequestUtils.resolveQueryLessRequestUrl(getExternalUrl());
+    }
+
+    protected abstract Integer getElementCount(IoParameters queryMap);
+
+    protected CountingMetadataService getEntityCounter() {
+        return counter;
+    }
+
+    private HttpServletResponse addPagingHeaders(String href, HttpServletResponse response, Paginated paginated) {
+        String l = "Link:";
+        if (paginated.getCurrent().isPresent()) {
+            response.addHeader(l, "<" + href + "?" + paginated.getCurrent().get().toString() + "> rel=\"self\"");
+        }
+        if (paginated.getNext().isPresent()) {
+            response.addHeader(l, "<" + href + "?" + paginated.getNext().get().toString() + "> rel=\"next\"");
+        }
+        if (paginated.getPrevious().isPresent()) {
+            response.addHeader(l, "<" + href + "?" + paginated.getPrevious().get().toString() + "> rel=\"previous\"");
+        }
+        if (paginated.getFirst().isPresent()) {
+            response.addHeader(l, "<" + href + "?" + paginated.getFirst().get().toString() + "> rel=\"first\"");
+        }
+        if (paginated.getLast().isPresent()) {
+            response.addHeader(l, "<" + href + "?" + paginated.getLast().get().toString() + "> rel=\"last\"");
+        }
+
+        return response;
     }
 }

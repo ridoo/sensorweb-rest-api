@@ -26,34 +26,34 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-package org.n52.web.ctrl;
+package org.n52.io.response.pagination;
 
-import org.n52.io.request.IoParameters;
-import org.n52.io.response.GeometryInfo;
-import org.n52.series.spi.geo.TransformingGeometryOutputService;
-import org.n52.series.spi.srv.ParameterService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.Optional;
 
-@RestController
-@RequestMapping(value = UrlSettings.COLLECTION_GEOMETRIES)
-public class GeometriesController extends ParameterRequestMappingAdapter<GeometryInfo> {
 
-    @Override
-    public void setParameterService(ParameterService<GeometryInfo> parameterService) {
-        super.setParameterService(new TransformingGeometryOutputService(parameterService));
-    }
+/**
+ *
+ * @author Christian Autermann
+ * @author Jan Speckamp
+ */
 
-    @Override
-    public String getCollectionPath(String hrefBase) {
-        UrlHelper urlhelper = new UrlHelper();
-        return urlhelper.constructHref(hrefBase, UrlSettings.COLLECTION_GEOMETRIES);
-    }
 
-    @Override
-    protected Integer getElementCount(IoParameters queryMap) {
-        //TODO(specki): Implementation of getCount  for Geometries in EntityCounter
-        return null;
-    }
+public interface Pagination {
+    int MAX_LIMIT = 1000;
 
+    long getStart();
+
+    long getEnd();
+
+    long getOffset();
+
+    long getLimit();
+
+    Optional<Pagination> first(long elements);
+
+    Optional<Pagination> previous(long elements);
+
+    Optional<Pagination> next(long elements);
+
+    Optional<Pagination> last(long elements);
 }

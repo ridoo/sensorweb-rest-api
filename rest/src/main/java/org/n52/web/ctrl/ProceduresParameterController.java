@@ -28,6 +28,7 @@
  */
 package org.n52.web.ctrl;
 
+import org.n52.io.request.IoParameters;
 import org.n52.io.response.ProcedureOutput;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,4 +37,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = UrlSettings.COLLECTION_PROCEDURES)
 public class ProceduresParameterController extends ParameterRequestMappingAdapter<ProcedureOutput> {
 
+    @Override
+    public String getCollectionPath(String hrefBase) {
+        UrlHelper urlhelper = new UrlHelper();
+        return urlhelper.constructHref(hrefBase, UrlSettings.COLLECTION_PROCEDURES);
+    }
+
+    @Override
+    protected Integer getElementCount(IoParameters queryMap) {
+        return super.getEntityCounter().getProcedureCount(queryMap);
+    }
 }

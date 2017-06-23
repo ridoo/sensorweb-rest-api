@@ -47,9 +47,9 @@ would be valid.
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Quantity Example (`stationary` platform)
 </div>
 ```
@@ -80,9 +80,9 @@ Quantity Example (`stationary` platform)
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Text example (observation interval, `stationary` platform)
 </div>
 ```
@@ -107,9 +107,9 @@ Text example (observation interval, `stationary` platform)
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Quantity example (`mobile` platform)
 </div>
 ```
@@ -162,9 +162,9 @@ and each implementation have to provide its own `valueType` within the `dataset`
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Typed Record Example: `text` (`stationary` platform)
 </div>
 ```
@@ -189,9 +189,9 @@ Typed Record Example: `text` (`stationary` platform)
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler" type="button" data-toggle="button">
 Customized Example: `fotoquest` (`stationary` platform)
 </div>
 [Fotoquest](https://github.com/52North/fotoquest-series-api) value types describe some 
@@ -295,9 +295,9 @@ different depth levels). The vertical unit is overridable within each vertical i
 
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Vertical Example (`stationary` platform)
 </div>
 ```

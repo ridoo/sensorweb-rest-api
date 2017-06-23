@@ -5,11 +5,10 @@ title: Common Configuration
 
 #### Common Utils
 
-
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 Configuration of common utility helpers
 </div>
 ```xml
@@ -30,9 +29,9 @@ Configuration of common utility helpers
 In case of a unique data backend a static service entity can be defined via Spring bean. Here's an example
 
 {::options parse_block_html="true" /}
-{: .n52-example-code}
+{: .n52-example-block}
 <div>
-<div class="n52-example-caption">
+<div class="btn n52-example-caption n52-example-toggler active" type="button" data-toggle="button">
 A static service configuration
 </div>
 ```xml

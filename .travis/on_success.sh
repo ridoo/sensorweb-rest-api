@@ -6,10 +6,9 @@ stop() {
 }
 
 DOCUMENTATION_BRANCHES=(
-  "documentation/docs-via-swagger-jekyll"
+  "documentation/general"
   "develop",
-  "master",
-  "versions/1.10.x"
+  "master"
 )
 
 deploy_on_ghpages() {
@@ -20,8 +19,8 @@ deploy_on_ghpages() {
   return 1
 }
 
-#[ !$(deploy_on_ghpages "${TRAVIS_BRANCH}") ] \
-#  || stop "do not deploy docs of ${TRAVIS_BRANCH}"
+[ !$(deploy_on_ghpages "${TRAVIS_BRANCH}") ] \
+  || stop "do not deploy docs of ${TRAVIS_BRANCH}"
 
 [ "${TRAVIS_SECURE_ENV_VARS}" == "true" ] \
   || stop "no secure enviroment variables were provided"

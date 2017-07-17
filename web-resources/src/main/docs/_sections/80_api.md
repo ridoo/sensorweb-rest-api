@@ -8,10 +8,10 @@ data: swagger
 
 {% for route in swagger.paths %}
 <div class="swagger-paths">
-  <h3 data-toc-skip class="swagger-path">{{ route[0] }}</h3>
+  <h3 class="swagger-path">{{ route[0] }}</h3>
   {% for method in route[1] %}
   <div class="swagger-method swagger-method-{{ method[0] }}">
-    <h4 data-toc-skip class="swagger-method-title">
+    <h4 class="swagger-method-title">
       <a href="#" class="swagger-method-link">
         <span class="swagger-method-name">{{ method[0] | upcase }}</span>
         {{ method[1].summary }}
@@ -23,7 +23,7 @@ data: swagger
         {{ method[1].description | markdownify }}
       </div>
       <div class="swagger-parameters">
-        <h5 data-toc-skip>Parameters</h5>
+        <h5>Parameters</h5>
         <table class="table">
           <thead>
             <tr>
@@ -92,9 +92,9 @@ data: swagger
       {% endif %}
       {% if method[1].responses %}
       <div class="swagger-response">
-        <h5 data-toc-skip>Responses</h5>
+        <h5>Responses</h5>
         {% for response in method[1].responses %}
-        <h6 data-toc-skip>
+        <h6>
           <span class="swagger-response-code">{{ response[0] }}</span>
           {{ response[1].description }}
         </h6>

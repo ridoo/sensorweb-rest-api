@@ -70,6 +70,10 @@ public abstract class ParameterController<T extends ParameterOutput>
     private ParameterService<T> parameterService;
 
     private String externalUrl;
+    
+    // mvn checkstyle compliance
+    private String fieldsString = "fields";
+    private String extrasString = "extras";
 
     public String getExternalUrl() {
         return externalUrl;
@@ -109,17 +113,18 @@ public abstract class ParameterController<T extends ParameterOutput>
         RequestUtils.overrideQueryLocaleWhenSet(locale, query);
         IoParameters map = QueryParameters.createFromQuery(query);
         LOGGER.debug("getExtras() with id '{}' and query '{}'", resourceId, map);
-
         Map<String, Object> extras = new HashMap<>();
-        for (MetadataExtension<T> extension : metadataExtensions) {
-            T from = parameterService.getParameter(resourceId, map);
-            final Map<String, Object> furtherExtras = extension.getExtras(from, map);
-            Collection<String> overridableKeys = checkForOverridingData(extras, furtherExtras);
-            if (!overridableKeys.isEmpty()) {
-                String[] keys = overridableKeys.toArray(new String[0]);
-                LOGGER.warn("Metadata extension overrides existing extra data: {}", Arrays.toString(keys));
+         if (!query.containsKey(fieldsString) || query.get(fieldsString).contains(extrasString)) {
+            for (MetadataExtension<T> extension : metadataExtensions) {
+                T from = parameterService.getParameter(resourceId, map);
+                final Map<String, Object> furtherExtras = extension.getExtras(from, map);
+                Collection<String> overridableKeys = checkForOverridingData(extras, furtherExtras);
+                if (!overridableKeys.isEmpty()) {
+                    String[] keys = overridableKeys.toArray(new String[0]);
+                    LOGGER.warn("Metadata extension overrides existing extra data: {}", Arrays.toString(keys));
+                }
+                extras.putAll(furtherExtras);
             }
-            extras.putAll(furtherExtras);
         }
         return extras;
     }
@@ -142,7 +147,10 @@ public abstract class ParameterController<T extends ParameterOutput>
 
         if (queryMap.isExpanded()) {
             Stopwatch stopwatch = Stopwatch.startStopwatch();
-            result = addExtensionInfos(parameterService.getExpandedParameters(queryMap));
+            result = parameterService.getExpandedParameters(queryMap);
+            if (!query.containsKey(fieldsString) || query.get(fieldsString).contains(extrasString)) {
+                result = addExtensionInfos(result);
+            }
             LOGGER.debug("Processing request took {} seconds.", stopwatch.stopInSeconds());
         } else {
             result = parameterService.getCondensedParameters(queryMap);
@@ -161,9 +169,11 @@ public abstract class ParameterController<T extends ParameterOutput>
         if (item == null) {
             throw new ResourceNotFoundException("Resource with id '" + id + "' not found.");
         }
-
-        T parameter = addExtensionInfos(item);
-        return new ModelAndView().addObject(parameter);
+        if (!query.containsKey(fieldsString) || query.get(fieldsString).contains(extrasString)) {
+            return new ModelAndView().addObject(addExtensionInfos(item));
+        } else {
+            return new ModelAndView().addObject(item);    
+        }
     }
 
     protected OutputCollection<T> addExtensionInfos(OutputCollection<T> toBeProcessed) {

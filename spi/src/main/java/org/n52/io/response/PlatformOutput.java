@@ -35,6 +35,7 @@ import org.n52.io.geojson.GeoJSONGeometrySerializer;
 import org.n52.io.response.dataset.DatasetOutput;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -66,8 +67,13 @@ public class PlatformOutput extends OutputWithParameters {
                 : base;
     }
 
+    /*
+     * Backwards compatibility is still given as DAO never returns platformtype=null for requests
+     * w/o "fields" query parameter.
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getPlatformType() {
-        return getType().getPlatformType();
+        return (platformType == null) ? null : platformType.getPlatformType();
     }
 
     @JsonIgnore

@@ -122,11 +122,10 @@ public abstract class ParameterOutput implements
     }
 
     /**
-     * @return the label or the id if label is not set.
+     * @return the label. Returns null if no label is set.
      */
     public String getLabel() {
-        // ensure that label is never null
-        return label == null ? id : label;
+        return label;
     }
 
     public void setLabel(String label) {
@@ -237,7 +236,7 @@ public abstract class ParameterOutput implements
      * @return a label comparing {@link Comparator}
      */
     public static <T extends ParameterOutput> Comparator<T> defaultComparator() {
-        return (T o1, T o2) -> o1.getLabel().compareTo(o2.getLabel());
+        return (T o1, T o2) -> o1.getId().compareTo(o2.getId());
     }
 
 }

@@ -74,7 +74,11 @@ public class RenderingHintsExtension extends MetadataExtension<DatasetOutput> {
     }
 
     private boolean hasRenderingHints(DatasetOutput output) {
-        return hasSeriesConfiguration(output) || hasPhenomenonConfiguration(output);
+        return hasSeriesParameters(output) && (hasSeriesConfiguration(output) || hasPhenomenonConfiguration(output));
+    }
+
+    private boolean hasSeriesParameters(DatasetOutput output) {
+        return output.getSeriesParameters() != null;
     }
 
     private boolean hasSeriesConfiguration(DatasetOutput output) {

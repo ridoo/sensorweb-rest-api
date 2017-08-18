@@ -75,7 +75,11 @@ public class StatusIntervalsExtension extends MetadataExtension<DatasetOutput> {
     }
 
     private boolean hasStatusIntervals(DatasetOutput output) {
-        return hasSeriesConfiguration(output) || hasPhenomenonConfiguration(output);
+        return hasSeriesParameters(output) && (hasSeriesConfiguration(output) || hasPhenomenonConfiguration(output));
+    }
+
+    private boolean hasSeriesParameters(DatasetOutput output) {
+        return output.getSeriesParameters() != null;
     }
 
     private boolean hasSeriesConfiguration(DatasetOutput output) {

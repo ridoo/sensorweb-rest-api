@@ -39,8 +39,8 @@ permalink: /api
 
 <div id="swagger-ui"></div>
 
-<script src="{{ site.baseurl }}/swagger-ui/swagger-ui-bundle-custom.js"> </script>
-<script src="{{ site.baseurl }}/swagger-ui/swagger-ui-standalone-preset.js"> </script>
+<script src="{{ site.baseurl }}/assets/javascripts/swagger-ui/swagger-ui-bundle-custom.js"> </script>
+<script src="{{ site.baseurl }}/assets/javascripts/swagger-ui/swagger-ui-standalone-preset.js"> </script>
 <script>
 window.onload = function() {
   // Build a system

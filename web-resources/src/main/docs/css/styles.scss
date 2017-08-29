@@ -8,7 +8,7 @@ $icon-font-path: "{{ site.baseurl }}/assets/fonts/bootstrap/";
 @import "bootstrap";
 @import "bootstrap-toc";
 @import "highlights";
-@import "swagger";
+@import "swagger-ui-custom.min";
 
 /*================================================
   =             BOOTSTRAP OVERRIDES              =

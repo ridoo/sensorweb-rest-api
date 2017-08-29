@@ -26,6 +26,7 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
+
 package org.n52.io;
 
 import java.io.BufferedInputStream;
@@ -41,16 +42,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public abstract class ConfigTypedFactory<T> {
+public abstract class ConfigTypedFactory<T> implements
+        ApplicationContextAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigTypedFactory.class);
 
     protected final Map<String, T> cache = new HashMap<>();
 
     protected Properties mappings;
+
+    private transient AutowireCapableBeanFactory beanFactory;
 
     protected ConfigTypedFactory(File configFile) {
         this.mappings = new Properties();
@@ -70,10 +78,17 @@ public abstract class ConfigTypedFactory<T> {
         this(getDefaultConfigFile(defaultConfig));
     }
 
+    @Override
+    public void setApplicationContext(final ApplicationContext context) {
+        beanFactory = context.getAutowireCapableBeanFactory();
+    }
+
     protected static InputStream getDefaultConfigFile(String configLocation) {
         try {
-            Path path = Paths.get(ConfigTypedFactory.class.getResource("/").toURI());
-            File file = path.resolve(configLocation).toFile();
+            Path path = Paths.get(ConfigTypedFactory.class.getResource("/")
+                                                          .toURI());
+            File file = path.resolve(configLocation)
+                            .toFile();
             if (file.exists()) {
                 return new FileInputStream(file);
             } else {
@@ -96,7 +111,7 @@ public abstract class ConfigTypedFactory<T> {
         }
     }
 
-    private InputStream createConfigStream(File file, Class<?> clazz) throws FileNotFoundException {
+    private InputStream createConfigStream(File file, Class< ? > clazz) throws FileNotFoundException {
         if (file != null && file.exists()) {
             LOGGER.debug("loading factory config from '{}'", file.getAbsolutePath());
             return new FileInputStream(file);
@@ -137,7 +152,7 @@ public abstract class ConfigTypedFactory<T> {
         }
         final String clazz = mappings.getProperty(type);
         try {
-            final Class<?> instanceType = Class.forName(clazz);
+            final Class< ? > instanceType = Class.forName(clazz);
             T instance = createInstance(instanceType);
             cache.put(type, instance);
             initInstance(instance);
@@ -149,29 +164,32 @@ public abstract class ConfigTypedFactory<T> {
         }
     }
 
-    private T createInstance(Class<?> clazz) throws InstantiationException, IllegalAccessException {
+    private T createInstance(Class< ? > clazz) throws InstantiationException, IllegalAccessException {
         final Object instance = clazz.newInstance();
         try {
             return (T) instance;
         } catch (ClassCastException e) {
             String targetType = getTargetType().getName();
-            String instanceType = instance.getClass().getName();
-            LOGGER.error("Config entry ('{}') must be assignable to '{}'!" , instanceType, targetType);
+            String instanceType = instance.getClass()
+                                          .getName();
+            LOGGER.error("Config entry ('{}') must be assignable to '{}'!", instanceType, targetType);
             throw e;
         }
     }
 
     protected abstract String getFallbackConfigResource();
 
+    // override if needed
     protected T initInstance(T instance) {
-        // override if needed
+        if (beanFactory != null) {
+            beanFactory.autowireBean(instance);
+        }
         return instance;
     }
 
-    protected abstract Class<?> getTargetType();
+    protected abstract Class< ? > getTargetType();
 
-    private void throwNewNoDatasetsAvailableForTypeException(String type) throws
-            DatasetFactoryException {
+    private void throwNewNoDatasetsAvailableForTypeException(String type) throws DatasetFactoryException {
         throw new DatasetFactoryException("No datasets available for '" + type + "'.");
     }
 

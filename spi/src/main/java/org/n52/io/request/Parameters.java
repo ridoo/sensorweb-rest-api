@@ -109,9 +109,18 @@ public interface Parameters {
     String DEFAULT_OUTPUT_TIMEZONE = "UTC";
 
     /**
-     * Parameter to specify the timeseries data with a result time
+     * Parameter to specify data with a result time
+     * @deprecated use {@link #RESULTTIMES} instead
      */
+    @Deprecated
     String RESULTTIME = "resultTime";
+
+    /**
+     * Parameter to specify data for particular result times
+     */
+    String RESULTTIMES = "resultTimes";
+
+    String RESULT_TIMES_VALUE_ALL = "all";
 
     /**
      * The width in px of the image to be rendered.
@@ -209,9 +218,29 @@ public interface Parameters {
     String DEFAULT_RENDERING_TRIGGER = "request";
 
     /**
-     * Determines the style parameter
+     * Determines that output shall be zipped (if possible).
+     */
+    String ZIP = "zip";
+
+    /**
+     * Flag to indicate if CSV encoding shall start with a Byte-Order-Mark
+     */
+    String BOM = "bom";
+
+    /**
+     * A token separator to separate CSV values
+     */
+    String TOKEN_SEPARATOR = "tokenSeparator";
+
+    /**
+     * Determines the style parameter for a single dataset
      */
     String STYLE = "style";
+
+    /**
+     * Determines the styles parameter for multiple datasets
+     */
+    String STYLES = "styles";
 
     /**
      * Determines the services filter

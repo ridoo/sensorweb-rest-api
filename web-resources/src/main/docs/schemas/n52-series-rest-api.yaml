@@ -1,0 +1,2567 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://example.org/api/v1'
+info:
+  title: 52°North Series API
+  description: Thin Web binding API to access series data
+  version: 2.0.0
+paths:
+  /:
+    get:
+      summary: Available endpoints.
+      parameters:
+        - $ref: '#/components/parameters/expandedParam'
+      tags:
+        - general
+      description: >
+        A (static) collection of endpoints available from this API. Each
+        includes a relative path and a short description.
+      responses:
+        '200':
+          description: A collection of API endpoints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointCollection'
+  /search:
+    get:
+      summary: A simple search.
+      tags:
+        - general
+      description: >
+        A simple search over all resource's labels over all available endpoints.
+        Note that the searching respects the current locale being selected.
+      parameters:
+        - name: q
+          in: query
+          description: Term which shall match (case insensitive) a resource's label
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+      responses:
+        '200':
+          description: A collection of search results
+  /platforms:
+    get:
+      summary: Available Platforms
+      tags:
+        - platform
+        - v2.0
+      description: >
+        A collection of available platforms. Depending on the `expanded`
+        parameter the collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/geometryTypesParam'
+        - $ref: '#/components/parameters/platformGeometriesParam'
+        - $ref: '#/components/parameters/observedGeometriesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+        - $ref: '#/components/parameters/crsParam'
+        - $ref: '#/components/parameters/bboxParam'
+        - $ref: '#/components/parameters/nearParam'
+      responses:
+        '200':
+          description: A collection of platforms
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformCollection'
+        '400':
+          description: A query parameter does not match expected format
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/platforms/{platformId}':
+    get:
+      summary: Gets a particular platform
+      tags:
+        - platform
+        - v2.0
+      description: >
+        Full view of a platform instance. A platform encodes a POINT geometry
+        which is the actual location for `stationary` platforms and the last
+        detected location for `mobile` platforms.
+      parameters:
+        - name: platformId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/crsParam'
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformItem'
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/platforms/{platformId}/extras':
+    get:
+      summary: Gets extra infos for platform
+      tags:
+        - platform
+        - v2.0
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each dataset.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields` query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: platformId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: An expanded item
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /stations:
+    get:
+      summary: Available Stations
+      tags:
+        - station
+      description: >
+        A collection of available stations. Depending on the `expanded`
+        parameter the collections items are compact or do inline full metadata.
+
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/crsParam'
+        - $ref: '#/components/parameters/bboxParam'
+        - $ref: '#/components/parameters/nearParam'
+      responses:
+        '200':
+          description: A collection of stations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationCollection'
+        '400':
+          description: A query parameter does not match expected format
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/stations/{stationId}':
+    get:
+      summary: Gets a particular station
+      tags:
+        - station
+      description: >
+        Full data view of a station. A station is a [GeoJSON point
+        geometry](https://www.rfc-editor.org/info/rfc7946) which encodes
+        available metadata in its `properties` member.
+      parameters:
+        - name: stationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/crsParam'
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationItem'
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/stations/{stationId}/extras':
+    get:
+      summary: Gets extra infos for station
+      tags:
+        - station
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each dataset.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields` query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: stationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: An expanded item
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets:
+    get:
+      summary: Gets available datasets
+      tags:
+        - dataset
+        - v2.0
+      description: >
+        A collection of available datasets. Depending on the `expanded`
+        parameter the collections items are compact or do inline full metadata.
+
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/geometryTypesParam'
+        - $ref: '#/components/parameters/platformGeometriesParam'
+        - $ref: '#/components/parameters/observedGeometriesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+        - $ref: '#/components/parameters/crsParam'
+        - $ref: '#/components/parameters/bboxParam'
+        - $ref: '#/components/parameters/nearParam'
+      responses:
+        '200':
+          description: A collection of datasets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetCollection'
+        '400':
+          description: A query parameter does not match expected format
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/datasets/{datasetId}':
+    get:
+      summary: Gets a particular dataset
+      tags:
+        - dataset
+        - v2.0
+      description: >
+        Full view of a dataset instance. All relevant relations (parameters,
+        unit, platform, etc.) are inlined. If any additional information is
+        listed in the `extras` array member it can be retrieved via
+        `/datasets/{datasetId}/extras` (see next).
+      parameters:
+        - name: datasetId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/datasets/{datasetId}/extras':
+    get:
+      summary: Gets extra infos for dataset
+      tags:
+        - dataset
+        - v2.0
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each dataset.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields` query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: datasetId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: An expanded item
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/datasets/{datasetId}/{interval}':
+    get:
+      summary: Gets extra infos for dataset
+      tags:
+        - dataset
+        - v2.0
+      description: >
+        Returns a pre-rendered image of a dataset for the given interval.
+        Allowed interval values are
+
+        * `lastDay.png`
+
+        * `lastWeek.png`
+
+        * `lastMonth.png`
+
+
+        Datasets of type `quantity` can be pre-rendered by a regular task. If
+        pre-rendering is enabled for a given datasets depends on the API
+        provider as it is a configuration issue.
+      parameters:
+        - name: datasetId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: interval
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: >-
+            In case no prerendered image available (or is currently being
+            rendered)
+  '/datasets/{datasetId}/data':
+    get:
+      summary: Gets data of a dataset
+      tags:
+        - dataset
+        - v2.0
+      description: >
+        Gets data for a given `timespan` filter. Implementations may limit the
+        maximum amount of time intervals a client can query in one request. 
+
+
+        What Mime-Types are supported depends on the `valueType`. For example
+        `quantity` observations can be drawn as a timeseries chart  (i.e. either
+        `image/png` or `application/pdf`). Supported Mime-Types are listed for
+        each `valueType` when querying 
+        `/service/{serviceId}?valueType=all` produces:
+
+          - `application/json`
+          - `image/png`
+          - `text/csv`
+          - `application/pdf`
+          - `application/zip`
+          
+        Data can be classified into result times if these differ from actual `timestamp`. For example, this is the case
+        for forecast data which might re-calculate (different result times) a given timespan. The `data` can be grouped 
+        by using `resultTimes` parameter. When `resultTimes` parameter is missing, data of the oldest result is being 
+        returned.
+      parameters:
+        - name: datasetId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/timespanParam'
+        - $ref: '#/components/parameters/resultTimesParam' 
+      responses:
+        '200':
+          description: Data for a given `timespan` in a requested output format
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /timeseries:
+    get:
+      summary: Gets available timeseries
+      tags:
+        - timeseries
+      description: >
+        A collection of timeseries (i.e. datasets of type `quantity` which have
+        been observed at `stationary`, `insitu` platforms having a 0-dimensional
+        (POINT) location geometry. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+        - $ref: '#/components/parameters/crsParam'
+        - $ref: '#/components/parameters/bboxParam'
+        - $ref: '#/components/parameters/nearParam'
+      responses:
+        '200':
+          description: A collection of timeseries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeseriesCollection'
+  '/timeseries/{timeseriesId}':
+    get:
+      summary: Gets a particular timeseries
+      tags:
+        - timeseries
+      description: >
+        Full view of a timeseries instance. All relevant relations (parameters,
+        unit, station, etc.) are inlined. If any additional information is
+        listed in the `extras` array member it can be retrieved via
+        `/datasets/{datasetId}/extras` (see next).
+
+
+        For backward compatibility reasons metadata about `renderingHints` and
+        `statusIntervals` are inlined here as well. However, those are listed
+        within `extra` infos to make it consistent.
+      parameters:
+        - name: timeseriesId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeseriesItem'
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/timeseries/{timeseriesId}/extras':
+    get:
+      summary: Gets extra infos for timeseries
+      tags:
+        - timeseries
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each timeseries.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields`query parameter and passing a comma-separated value list to it. 
+      parameters:
+        - name: timeseriesId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/timeseries/{timeseriesId}/getData':
+    get:
+      summary: Gets data of a timeseries
+      tags:
+        - timeseries
+      description: >
+        Gets data for a given `timespan` filter. Implementations may limit the
+        maximum amount of time intervals a client can query in one request. 
+
+
+        This operation does only return data of `quantity` dataset types
+        from`stationary`, `insitu` platforms having a 0-dimensional location
+        geometry (`station`). Supported Mime-Types are `application/json`,
+        `image/png`, `application/pdf`, and `text/csv`.
+      parameters:
+        - name: timeseriesId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/timespanParam'
+        - $ref: '#/components/parameters/widthParam'
+        - $ref: '#/components/parameters/heightParam'
+        - $ref: '#/components/parameters/legendParam'
+        - $ref: '#/components/parameters/gridParam'
+        - $ref: '#/components/parameters/generalizeParam'
+        - $ref: '#/components/parameters/formatParam'
+        - $ref: '#/components/parameters/base64Param'
+      responses:
+        '200':
+          description: Data for a given `timespan` in a requested output format
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Error'
+            text/csv:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Error'
+            text/csv:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Error'
+            text/csv:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /geometries:
+    get:
+      summary: A collection of available geometries
+      tags:
+        - geometry
+        - v2.0
+      description: >
+        All available geometries instances. Possible geometry types are 
+
+
+        * `site`, i.e. `stationary` platform locations (fixed) 
+
+
+        * `track`, i.e. trajectories made by a `mobile` platform
+
+
+        * `static`, i.e. a fixed geometry observed by a `remote` platform
+
+
+        * `dynamic`, i.e. geometry observed by a `remote` platform which changes
+        over time
+      parameters:
+        - $ref: '#/components/parameters/geometryTypesParam'
+        - $ref: '#/components/parameters/platformGeometriesParam'
+        - $ref: '#/components/parameters/observedGeometriesParam'
+        - $ref: '#/components/parameters/crsParam'
+        - $ref: '#/components/parameters/bboxParam'
+        - $ref: '#/components/parameters/nearParam'
+      responses:
+        '200':
+          description: A collection of geometries
+  '/geometries/{geometryId}':
+    get:
+      summary: Gets a particular geometry
+      tags:
+        - geometry
+        - v2.0
+      description: >
+        Full view of a geometry instance. Encodes as full [GeoJSON
+        geometry](https://www.rfc-editor.org/info/rfc7946).
+      parameters:
+        - name: geometryId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/crsParam'
+      responses:
+        '200':
+          description: An expanded item
+        '400':
+          description: A query parameter does not match expected format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /services:
+    get:
+      summary: Get available service instances
+      tags:
+        - parameter
+      description: >
+        All available service instances. For backwards compatibility reasons the
+        output is filtered by default to list only those instances related to
+        `stationary`, `insitu` platforms. To retrieve a full metadata view add
+        `platformTypes=all`.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of services
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceCollection'
+  '/services/{serviceId}':
+    get:
+      summary: Gets an instance
+      tags:
+        - parameter
+      description: >
+        Gets a service instance.
+
+
+
+        Depending on what dataset types are available, differing output formats
+        are available. For example, `image/png` (render as chart) or
+        `application/pdf` (generating a report).
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/services/{serviceId}/extras':
+    get:
+      summary: Gets extra infos for a service
+      tags:
+        - parameter
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available  metadata fields are listed in the `extras` metadata field of
+        each service.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields`  query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /categories:
+    get:
+      summary: Gets available categories
+      tags:
+        - parameter
+      description: >
+        All available category instances. For backwards compatibility reasons,
+        the output is filtered by default to list only those instances related
+        to `stationary`, `insitu` platforms. To retrieve a full metadata view
+        add `platformTypes=all`. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParametersCollection'
+  '/categories/{categoryId}':
+    get:
+      summary: Gets a category instance
+      tags:
+        - parameter
+      description: |
+        Gets a category instance.
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/categories/{categoryId}/extras':
+    get:
+      summary: Gets extra infos for a category
+      tags:
+        - parameter
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available  metadata fields are listed in the `extras` metadata field of
+        each category.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields`  query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /phenomena:
+    get:
+      summary: Get available phenomenon instances
+      tags:
+        - parameter
+      description: >
+        All available phenomenon instances. For backwards compatibility reasons,
+        the output is filtered by default to list only those instances related
+        to `stationary`, `insitu` platforms. To retrieve a full metadata view
+        add `platformTypes=all`. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of phenomena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParametersCollection'
+  '/phenomena/{phenomenonId}':
+    get:
+      summary: Gets a phenomenon instance
+      tags:
+        - parameter
+      description: |
+        Gets a phenomenon instance
+      parameters:
+        - name: phenomenonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/phenomena/{phenomenonId}/extras':
+    get:
+      summary: Gets extra infos for a phenomenon
+      tags:
+        - parameter
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each phemomenon.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields`  query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: phenomenonId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /procedure:
+    get:
+      summary: Get available procedure instances
+      tags:
+        - parameter
+      description: >
+        All available procedure instances. For backwards compatibility reasons,
+        the output is filtered by default to list only those instances related
+        to `stationary`, `insitu` platforms. To retrieve a full metadata view
+        add `platformTypes=all`. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of procedures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParametersCollection'
+  '/procedures/{procedureId}':
+    get:
+      summary: Gets a procedure instance
+      tags:
+        - parameter
+      description: |
+        Gets a procedure instance.
+      parameters:
+        - name: procedureId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/procedures/{procedureId}/extras':
+    get:
+      summary: Gets extra infos for a procedure
+      tags:
+        - parameter
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each procedure.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields`  query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: procedureId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /offerings:
+    get:
+      summary: Get available offerings instances
+      tags:
+        - parameter
+      description: >
+        All available offering instances. For backwards compatibility reasons,
+        the output is filtered by default to list only those instances related
+        to `stationary`, `insitu` platforms. To retrieve a full metadata view
+        add `platformTypes=all`. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of offerings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParametersCollection'
+  '/offerings/{offeringId}':
+    get:
+      summary: Gets an offering instance
+      tags:
+        - parameter
+      description: |
+        Gets an offering instance.
+      parameters:
+        - name: offeringId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/offerings/{offeringId}/extras':
+    get:
+      summary: Gets extra infos for a phenomenon
+      tags:
+        - parameter
+      description: >
+        Lists extra metadata which may vary from instance to instance. The
+        available metadata fields are listed in the `extras` metadata field of
+        each offering.
+
+
+        You can query just the ones you are interested in by appending the
+        `fields` query parameter and passing a comma-separated value list to
+        it. 
+      parameters:
+        - name: offeringId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /features:
+    get:
+      summary: Get available feature instances
+      tags:
+        - parameter
+      description: >
+        All available instances. For backwards compatibility reasons the output 
+        is filtered by default to list only those instances related to
+        `stationary`,  `insitu` platforms. To retrieve a full metadata view add
+        `platformTypes=all`.
+      parameters:
+        - $ref: '#/components/parameters/localeParam'
+        - $ref: '#/components/parameters/expandedParam'
+        - $ref: '#/components/parameters/servicesParam'
+        - $ref: '#/components/parameters/categoriesParam'
+        - $ref: '#/components/parameters/phenomenaParam'
+        - $ref: '#/components/parameters/proceduresParam'
+        - $ref: '#/components/parameters/offeringsParam'
+        - $ref: '#/components/parameters/platformsParam'
+        - $ref: '#/components/parameters/stationsParam'
+        - $ref: '#/components/parameters/platformTypesParam'
+        - $ref: '#/components/parameters/valueTypesParam'
+      responses:
+        '200':
+          description: A collection of features
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParametersCollection'
+  '/features/{featureId}':
+    get:
+      summary: Gets an feature instance
+      tags:
+        - parameter
+      description: |
+        Gets a feature instance.
+      parameters:
+        - name: featureId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An expanded item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterItem'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/features/{featureId}/extras':
+    get:
+      summary: Gets extra infos for a feature
+      tags:
+        - parameter
+      description: >
+        All available feature instances. For backwards compatibility reasons,
+        the output is filtered by default to list only those instances related
+        to `stationary`, `insitu` platforms. To retrieve a full metadata view
+        add `platformTypes=all`. Depending on the `expanded` parameter the
+        collections items are compact or do inline full metadata.
+
+
+        Filter options help to focus on a particular set of items. Filter either
+        by parameters or spatially.
+      parameters:
+        - name: featureId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A list of (selected) extra infos
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Media Item not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    # Start of Response Schemata
+    EndpointCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointItem'
+      example:
+        - id: services
+          label: Service Provider
+          description: A service provider offers timeseries data.
+        - id: stations
+          label: Stations
+          description: A station is the place where measurement takes place.
+        - id: timeseries
+          label: Timeseries
+          description: Represents a sequence of data values measured over time.
+        - id: categories
+          label: Category
+          description: A category groups available timeseries.
+        - id: offerings
+          label: Offering
+          description: An organizing unit to filter resources.
+        - id: features
+          label: Feature
+          description: An organizing unit to filter resources.
+        - id: procedures
+          label: Procedure
+          description: An organizing unit to filter resources.
+        - id: phenomena
+          label: Phenomenon
+          description: An organizing unit to filter resources.
+        - id: platforms
+          label: Platforms
+          description: A sensor platform where observations are made.
+        - id: datasets
+          label: Datasets
+          description: Represents a sequence of data values observed over time.
+        - id: geometries
+          label: Geometries
+          description: A geometry where observations are made or that was observed.
+    EndpointItem:
+      type: object
+      title: EndpointItem
+      properties:
+        id:
+          type: string
+          enum:
+            - services
+            - stations
+            - timeseries
+            - categories
+            - offerings
+            - features
+            - phenomena
+            - platforms
+            - datasets
+            - geometries
+        label:
+          type: string
+        description:
+          type: string
+        size:
+          type: number
+      required:
+        - id
+        - label
+        - description
+      additionalProperties: false
+    PlatformCollection:
+      type: array
+      title: PlatformCollection
+      items:
+        $ref: '#/components/schemas/PlatformItem'
+      example:
+        - id: stationary_insitu_1
+          href: 'http://example.org/api/platforms/stationary_insitu_1'
+          domainId: elv-ws2500-internal
+          label: 52n-serverroom
+          platformType: stationary_insitu
+        - id: stationary_insitu_2
+          href: 'http://example.org/api/platforms/stationary_insitu_2'
+          domainId: vaisala-wxt520
+          label: Vaisala WXT 520
+          platformType: stationary_insitu
+    PlatformItem:
+      type: object
+      title: PlatformItem
+      properties:
+        id:
+          type: string
+        href:
+          type: string
+        domainid:
+          type: string
+        label:
+          type: string
+        extras:
+          type: array
+          items:
+            type: string
+        platformType:
+          type: string
+          enum:
+            - stationary_insitu
+            - stationary_remote
+            - mobile_insitu
+            - mobile_remote
+        datasets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasetCollection'
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+      required:
+        - id
+        - href
+        - domainid
+        - label
+        - platformType
+      additionalProperties: false
+      example:
+        id: stationary_insitu_1
+        href: 'http://localhost:8080/platforms/stationary_insitu_1'
+        domainId: elv-ws2500-internal
+        label: 52n-serverroom
+        extras:
+          - license
+          - parents
+        platformType: stationary_insitu
+        datasets:
+          - id: quantity_12
+            href: 'http://localhost:8080/datasets/quantity_12'
+            label: 'Humidity ws2500-internal, 52n-serverroom, offeringID'
+            valueType: quantity
+            platformType: stationary_insitu
+        geometry:
+          type: Point
+          coordinates:
+            - 7.65234184265137
+            - 51.934814453125
+    StationCollection:
+      type: array
+      title: StationCollection
+      items:
+        $ref: '#/components/schemas/StationItem'
+      example:
+        - type: Feature
+          id: '1'
+          properties:
+            id: '1'
+            label: 52n-serverroom
+          geometry:
+            type: Point
+            coordinates:
+              - 7.65234184265137
+              - 51.934814453125
+        - type: Feature
+          id: '2'
+          properties:
+            id: '2'
+            label: Vaisala WXT 520
+          geometry:
+            type: Point
+            coordinates:
+              - 7.65237522125244
+              - 51.9347763061523
+    StationItem:
+      type: object
+      title: StationItem
+      additionalProperties: false
+      properties:
+        id:
+          type: number
+        type:
+          type: string
+        properties:
+          type: object
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+      required:
+        - type
+        - id
+        - properties
+        - geometry
+      example:
+        type: Feature
+        id: '1'
+        properties:
+          timeseries:
+            '12':
+              phenomenon:
+                id: '34'
+                label: Humidity
+              procedure:
+                id: '5'
+                label: ws2500-internal
+              category:
+                id: '34'
+                label: Humidity
+              offering:
+                id: '5'
+                label: offeringID
+              feature:
+                id: '1'
+                label: 52n-serverroom
+              service:
+                id: '1'
+                label: SOS RESTful Dataset Service
+          id: '1'
+          label: 52n-serverroom
+        geometry:
+          type: Point
+          coordinates:
+            - 7.65234184265137
+            - 51.934814453125
+    DatasetCollection:
+      type: array
+      title: DatasetCollection
+      items:
+        $ref: '#/components/schemas/DatasetItem'    
+      example:
+        - id: quantity_10
+          href: 'http://localhost:8080/datasets/quantity_10'
+          label: 'Humidity wxt520, Vaisala WXT 520, offeringID'
+          valueType: quantity
+          platformType: stationary_insitu
+        - id: quantity_11
+          href: 'http://localhost:8080/datasets/quantity_11'
+          label: 'WindSpeed ws2500, ELV WS2500, offeringID'
+          valueType: quantity
+          platformType: stationary_insitu
+    DatasetItem:
+      type: object
+      title: DatasetItem
+      additionalProperties: false
+      properties:
+        id:
+          type: number
+        href:
+          type: string
+        label:
+          type: string
+        extras:
+          type: array
+          items:
+            type: string
+        valueType:
+          type: string
+        platformType:
+          type: string
+          enum:
+            - stationary_insitu
+            - stationary_remote
+            - mobile_insitu
+            - mobile_remote
+        datasetParameters:
+          type: object
+          additionalProperties: false
+          properties:
+            phenomenon:
+              $ref: '#/components/schemas/DatasetParameter'
+            procedure:
+              $ref: '#/components/schemas/DatasetParameter'
+            category:
+              $ref: '#/components/schemas/DatasetParameter'
+            offering:
+              $ref: '#/components/schemas/DatasetParameter'
+            feature:
+              $ref: '#/components/schemas/DatasetParameter'
+            service:
+              $ref: '#/components/schemas/DatasetParameter'
+            platform:
+              allOf:
+                - $ref: '#/components/schemas/DatasetParameter'
+                - type: object
+                  additionalProperties: false
+                  properties:
+                    domainId:
+                      type: string
+                    platformType:
+                      type: string
+                      enum:
+                        - stationary_insitu
+                        - stationary_remote
+                        - mobile_insitu
+                        - mobile_remote
+        firstValue:
+          type: object
+          additionalProperties: false
+          properties:
+            timestamp:
+              type: number
+            value:
+              type: string
+        lastValue:
+          type: object
+          additionalProperties: false
+          properties:
+            timestamp:
+              type: number
+            value:
+              type: string
+        uom:
+          type: string
+      required:
+        - id
+        - href
+        - label
+        - valueType
+        - platformType
+      example:
+        id: quantity_10
+        href: 'http://localhost:8080/datasets/quantity_10'
+        label: 'Humidity wxt520, Vaisala WXT 520, offeringID'
+        extras:
+          - license
+        valueType: quantity
+        platformType: stationary_insitu
+        datasetParameters:
+          phenomenon:
+            id: '34'
+            href: 'http://localhost:8080/phenomena/34'
+            label: Humidity
+          procedure:
+            id: '4'
+            href: 'http://localhost:8080/procedures/4'
+            label: wxt520
+          category:
+            id: '34'
+            href: 'http://localhost:8080/categories/34'
+            label: Humidity
+          offering:
+            id: '4'
+            href: 'http://localhost:8080/offerings/4'
+            label: offeringID
+          feature:
+            id: '2'
+            href: 'http://localhost:8080/features/2'
+            label: Vaisala WXT 520
+          service:
+            id: '1'
+            href: 'http://localhost:8080/services/1'
+            label: SOS RESTful Dataset Service
+          platform:
+            id: stationary_insitu_2
+            href: 'http://localhost:8080/platforms/stationary_insitu_2'
+            domainId: vaisala-wxt520
+            label: Vaisala WXT 520
+            platformType: stationary_insitu
+        firstValue:
+          timestamp: 1496276215000
+          value: 78
+        lastValue:
+          timestamp: 1498693606000
+          value: 69
+        uom: '%'
+        
+    TimeseriesCollection:
+      type: array
+      title: TimeseriesCollection
+      items:
+        $ref: '#components/schemas/TimeseriesItem'
+      example:
+      - id: '15'
+        label: 'AirTemperature ws2500, ELV WS2500, offeringID'
+        uom: degC
+        station:
+          type: Feature
+          id: '3'
+          properties:
+            id: '3'
+            label: ELV WS2500
+          geometry:
+            type: Point
+            coordinates:
+              - 7.652428150177
+              - 51.934814453125
+        parameters: {}
+      - id: '17'
+        label: 'AirTemperature ws2500-internal, 52n-serverroom, offeringID'
+        uom: degC
+        station:
+          type: Feature
+          id: '1'
+          properties:
+            id: '1'
+            label: 52n-serverroom
+          geometry:
+            type: Point
+            coordinates:
+              - 7.65234184265137
+              - 51.934814453125
+        parameters: {}
+        
+    TimeseriesItem:
+      type: object
+      title: TimeseriesItem
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        extras:
+          type: array
+          items:
+            type: string
+        referenceValues:
+          type: array
+          items:
+            type: object
+        firstValue:
+          type: object
+          additionalProperties: false
+          properties:
+            timestamp: 
+              type: number
+            value:
+              type: number
+        uom:
+          type: string
+        station:
+          $ref: '#/components/schemas/StationItem'
+        parameters:
+          type: object
+          additionalProperties: false
+          properties:
+            phenomenon:
+              $ref: '#/components/schemas/TimeseriesParameter'
+            procedure:
+              $ref: '#/components/schemas/TimeseriesParameter'
+            category:
+              $ref: '#/components/schemas/TimeseriesParameter'
+            offering:
+              $ref: '#/components/schemas/TimeseriesParameter'
+            feature:
+              $ref: '#/components/schemas/TimeseriesParameter'
+            service:
+              $ref: '#/components/schemas/TimeseriesParameter'
+          required:
+          - phenomenon
+          - procedure
+          - category
+          - offering
+          - feature
+          - service
+      required:
+      - id
+      - label
+      - uom
+      - station
+      - parameters
+      example:
+        id: '15'
+        label: 'AirTemperature ws2500, ELV WS2500, offeringID'
+        extras:
+          - license
+        referenceValues: []
+        firstValue:
+          timestamp: 1496277000000
+          value: 6.4
+        lastValue:
+          timestamp: 1498693500000
+          value: 17.3
+        uom: degC
+        station:
+          type: Feature
+          id: '3'
+          properties:
+            id: '3'
+            label: ELV WS2500
+          geometry:
+            type: Point
+            coordinates:
+              - 7.652428150177
+              - 51.934814453125
+        parameters:
+          phenomenon:
+            id: '27'
+            label: AirTemperature
+          procedure:
+            id: '7'
+            label: ws2500
+          category:
+            id: '27'
+            label: AirTemperature
+          offering:
+            id: '7'
+            label: offeringID
+          feature:
+            id: '3'
+            label: ELV WS2500
+          service:
+            id: '1'
+            label: SOS RESTful Dataset Service
+        
+    ServiceCollection:
+      type: array
+      items: 
+        $ref: '#/components/schemas/ServiceItem'
+      example:
+      - id: '1'
+        label: 'SOS RESTful Dataset Service'
+
+    ServiceItem:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        extras:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+        type: 
+          type: string
+        supportsfirstlatest:
+          type: boolean
+        supportedMimeTypes:
+          type: object
+          additionalProperties: false
+          minProperties: 4
+          maxProperties: 4
+          properties: 
+            quantity: 
+              type: array
+              uniqueItems: true
+              items: 
+                type: string
+            quantity-profile: 
+              type: array
+              uniqueItems: true
+              items:
+                type: string
+            count: 
+              type: array
+              uniqueItems: true
+              items: 
+                type: string
+            text: 
+              type: array
+              uniqueItems: true
+              items: 
+                type: string
+        quantities:
+          type: object
+          additionalProperties: false
+          properties:
+            datasets:
+              type: number
+            platforms:
+              type: number
+            phenomena:
+              type: number
+            features:
+              type: number
+            categories:
+              type: number
+            offerings:
+              type: number
+            procedures:
+              type: number
+          required:
+          - datasets
+          - platforms
+          - phenomena
+          - features
+          - categories
+          - offerings
+          - procedures
+      required:
+      - id
+      - label
+      example:
+        id: '1'
+        label: SOS RESTful Dataset Service
+        extras:
+          - license
+        version: '2.0'
+        type: Thin DB access layer service.
+        supportsfirstlatest: true
+        supportedMimeTypes:
+          quantity:
+            - image/png
+            - application/pdf
+            - application/json
+            - text/csv
+            - application/zip
+          quantity-profile:
+            - application/json
+          count:
+            - application/json
+          text:
+            - application/json
+        quantities:
+          datasets: 40
+          platforms: 4
+          phenomena: 30
+          features: 4
+          categories: 30
+          offerings: 4
+          procedures: 4
+          
+    ParametersCollection:
+      type: array
+      title: ParametersCollection
+      items:
+        $ref: '#components/schemas/ParameterItem'
+      example:
+      - id: '1'
+        domainId: test_1
+        label: test_label_1
+      - id: '2'
+        domainId: test_2
+        label: test_label_2
+        
+    ParameterItem:
+      type: object
+      title: ParameterItem
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        domainId:
+          type: string
+        label:
+          type: string
+        extras:
+          type: array
+          items:
+            type: string
+        service:
+          type: object
+          additionalProperties: false
+          properties:
+            id:
+              type: string
+            label:
+              type: string
+          required:
+          - id
+          - label
+      required:
+        - id
+        - domainId
+        - label
+      example:
+        id: 1
+        domainId: 'TESTDOMAIN'
+        label: 'TESTLABEL'
+        extras:
+        - license
+        service:
+          id: 1
+          label: SOS RESTful Dataset Service
+        
+    # Helper Schemas
+    Geometry:
+      type: object
+      properties:
+        type:
+          type: string
+        coordinates:
+          type: array
+          items:
+            type: number
+    DatasetParameter:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: number
+        href:
+          type: string
+        label:
+          type: string
+      required:
+        - id
+        - href
+        - label
+    TimeseriesParameter:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+      required:
+      - id
+      - label
+    StyledDataRequest:
+      type: object
+      required:
+        - styleOptions
+      properties:
+        legend:
+          type: boolean
+        grid:
+          type: boolean
+        locale:
+          type: string
+        width:
+          type: integer
+          format: int32
+        height:
+          type: integer
+          format: int32
+        timespan:
+          type: string
+        styleOptions:
+          $ref: '#/components/schemas/Style'
+    Style:
+      type: object
+      description: ''
+      properties:
+        chartType:
+          type: string
+          enum:
+            - line
+            - bar
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+        reason:
+          type: string
+        userMessage:
+          type: string
+          
+  # Query Parameters
+  parameters:
+    expandedParam:
+      name: expanded
+      in: query
+      description: >
+        If `true` a list of partially expanded resource items is returned. The
+        expansion provides more  detailed information up to a certain point.
+        However, it does not necessarily provide all item  information as one
+        may get when request the resource item itself.
+
+
+        The expanded works almost only for resource collection. However,
+        exceptions may exist (e.g.  for getting raw data). Exceptions are
+        explicitly documented. The default is `false`.
+      schema:
+        type: boolean
+    platformTypesParam:
+      name: platformTypes
+      in: query
+      description: >
+        Filters the resources to get only those related to the platform type
+        filter.
+
+
+        Allowed values are `stationary`, `mobile`, `insitu`, `remote`, `all`. 
+
+
+        The default is `stationary,insitu`.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    valueTypesParam:
+      name: valueTypes
+      in: query
+      description: >
+        Filters the resources to get only those related to the dataset type
+        filter.
+
+
+        Allowed values are `quantity`, `count`, `text`, `all` or any other
+        custom types given by the  implementing backend.
+
+
+        The default is `quantity`.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    servicesParam:
+      name: services
+      in: query
+      description: >
+        All resources where the given service id does match. The single form
+        (`service`) is kept for backwards compatibility. Please use the plural
+        form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    categoriesParam:
+      name: categories
+      in: query
+      description: >
+        All resources where the given category id does match. The single form
+        (`category`) is kept for backwards compatibility. Please use the plural
+        form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    phenomenaParam:
+      name: phenomena
+      in: query
+      description: >
+        All resources where the given phenomenon id does match. The single form
+        (`phenomenon`) is kept for backwards compatibility. Please use the
+        plural form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    proceduresParam:
+      name: procedures
+      in: query
+      description: >
+        All resources where the given procedure id does match. The single form
+        (`procedure`) is kept for backwards compatibility. Please use the plural
+        form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    offeringsParam:
+      name: offerings
+      in: query
+      description: >
+        All resources where the given offering id does match. The single form
+        (`offering`) is kept for backwards compatibility. Please use the plural
+        form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    stationsParam:
+      name: stations
+      in: query
+      description: >
+        All resources where the given station id does match. The single form
+        (`station`) is kept for backwards compatibility. Please use the plural
+        form to filter on multiple ids.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    platformsParam:
+      name: platforms
+      in: query
+      description: |
+        All resources where the given platform id does match.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    localeParam:
+      name: locale
+      in: query
+      description: >
+        Specifies the language as [ISO639](http://en.wikipedia.org/wiki/ISO_639)
+        code. Subdivisions are  respected by an `_` , e.g. `en_US` for American
+        English.
+
+
+        The REST-API should consider the following order to detect a locale
+
+
+        * Accept-Language (e.g. header information)
+
+        * locale parameter
+
+
+        A fallback language cannot be specified as it depends on the data of the
+        service provider.
+      schema:
+        type: string
+    timespanParam:
+      name: timespan
+      in: query
+      description: >
+        An [ISO8601](http://en.wikipedia.org/wiki/ISO_8601#Time_intervals) 
+        formatted period. Only backslash formatted values are supported.
+      schema:
+        type: string
+    crsParam:
+      name: crs
+      in: query
+      description: >
+        The client indicates that input geometries shall be interpreted as being
+        referenced by the given CRS (for example in case of `crs=EPSG:25832` to 
+        [ETRS89/UTM zone 32N](http://spatialreference.org/ref/epsg/25832/)).
+
+
+        Per default geometries are referenced by the WGS84 CRS (CRS84, i.e.
+        lon/lat order). If crs value differs from default, all output geometries
+        are transformed to match the asked CRS.
+
+
+        Please note that some CRS switch coordinate axes. Double check axes
+        ordering before interpreting coordinates!
+      schema:
+        type: string
+    bboxParam:
+      name: bbox
+      in: query
+      description: >
+        Stations within a given bounding box (in WGS84 by default). Refer to the
+        crs parameter if a  non-default CRS shall be used. The Box can be
+        supplied as either as json Points or as GeoJSON bbox.
+
+
+        Alternative 1: json Points
+
+
+        ```json  bbox={
+          "ll": {
+            "type": "Point",
+            "coordinates": [<x>,<y>]
+          },
+          "ur": {
+            "type": "Point",
+            "coordinates": [<x>,<y>]
+          }
+        }
+
+        ```
+
+
+        Alternative 2: GeoJSON bbox
+
+
+        ```json bbox=<minx>,<miny>,<maxx>,<maxy> ```
+      schema:
+        type: string
+    nearParam:
+      name: near
+      in: query
+      description: >
+        Stations within a given bounding box (in WGS84 by default). Refer to the
+        `crs` parameter if a  non-default CRS shall be used.
+
+
+        ```json near={
+          "center": {
+            "type": "Point",
+            "coordinates": [<x>,<y>]
+          },
+          "radius":500
+        }
+
+        ```
+      schema:
+        type: string
+    legendParam:
+      name: legend
+      in: query
+      description: >
+        Indicates if a legend shall be rendered directly on the image output (if
+        `image/png` shall be  the output).
+      schema:
+        type: boolean
+    gridParam:
+      name: grid
+      in: query
+      description: ''
+      schema:
+        type: boolean
+    widthParam:
+      name: width
+      in: query
+      description: |
+        If `image/png` is requested, width determines the width in pixels.
+      schema:
+        type: integer
+        format: int32
+    heightParam:
+      name: height
+      in: query
+      description: |
+        If `image/png` is requested, height determines the height in pixels.
+      schema:
+        type: integer
+        format: int32
+    generalizeParam:
+      name: generalize
+      in: query
+      description: >
+        Indicates that timeseries data shall be generalized. See generalization
+        section for details.
+      schema:
+        type: boolean
+    formatParam:
+      name: format
+      in: query
+      description: >
+        Controls the output format of raw timeseries data. This avoids
+        converting between different  data formats on client side which uses a
+        3rd party chart rendering API. Currently, supported formats
+
+          * *tvp* Time value pairs (the default)
+          
+          * *highcharts* [Highcharts](http://www.highcharts.com/) series data format.
+          
+          
+        Refer to the Format section for detailed information how the formats
+        will look like.
+      schema:
+        type: string
+    base64Param:
+      name: base64
+      in: query
+      description: >
+        Indicates binary images shall be encoded to a base64 string on server
+        side. This makes it easily possible to display images from JavaScript
+        (you would need a byte parsing library  otherwise).
+
+
+        Here is an example how to embed encoded base64 string
+
+        ```
+
+        <img src='data:image/png;base64," + encodedString + "' />
+
+        ```
+      schema:
+        type: boolean
+    geometryTypesParam:
+      name: geometryTypes
+      in: query
+      description: >
+        The type of geometry based on [WKT
+        types](https://en.wikipedia.org/wiki/Well-known_text).
+      schema:
+        type: string
+        enum:
+          - point
+          - linestring
+          - polygon
+    platformGeometriesParam:
+      name: platformGeometries
+      in: query
+      description: >
+        The platform's geometry, either `site` for `stationary` platforms (or
+        `station`s) or `track` for `mobile` platforms.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - site
+            - track
+    observedGeometriesParam:
+      name: observedGeometries
+      in: query
+      description: >
+        The platform's observed geometry, either `static` for `remote` platforms
+        observing fixed geometries or `dynamic` otherwise.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - static
+            - dynamic
+    resultTimesParam:
+      name: resultTimes
+      in: query
+      description: >
+        Filter data which is available for different result times. Query `/extras?fields=resultTimes` beforehand to get
+        a list of result times or add `resultTimes=all` to get all data classified by result time. In case of `resultTime`
+        is missing from Query, those data will be returned which belongs to the oldest result time.
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string

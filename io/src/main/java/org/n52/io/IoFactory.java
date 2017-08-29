@@ -26,15 +26,15 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
+
 package org.n52.io;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
+
+import org.n52.io.format.ResultTimeFormatter;
 import org.n52.io.request.IoParameters;
-import org.n52.io.request.RequestParameterSet;
-import org.n52.io.request.RequestSimpleParameterSet;
-import org.n52.io.request.RequestStyledParameterSet;
 import org.n52.io.response.dataset.AbstractValue;
 import org.n52.io.response.dataset.Data;
 import org.n52.io.response.dataset.DataCollection;
@@ -42,45 +42,37 @@ import org.n52.io.response.dataset.DatasetOutput;
 import org.n52.series.spi.srv.DataService;
 import org.n52.series.spi.srv.ParameterService;
 
-public abstract class IoFactory<D extends Data<V>, P extends DatasetOutput<V, ?>, V extends AbstractValue<?>> {
+public abstract class IoFactory<D extends Data<V>, P extends DatasetOutput<V, ? >, V extends AbstractValue< ? >> {
+
+    private IoParameters parameters;
 
     private DataService<D> dataService;
 
     private ParameterService<P> datasetService;
 
-    private RequestSimpleParameterSet simpleRequest;
-
-    private RequestStyledParameterSet styledRequest;
-
     private URI basePath;
 
-    public IoFactory<D, P, V> withSimpleRequest(RequestSimpleParameterSet request) {
-        this.simpleRequest = request;
+    public IoFactory() {
+        this.parameters = IoParameters.createDefaults();
+    }
+
+    public IoFactory<D, P, V> setParameters(IoParameters parameters) {
+        this.parameters = parameters;
         return this;
     }
 
-    public IoFactory<D, P, V> withStyledRequest(RequestStyledParameterSet request) {
-        this.styledRequest = request;
+    public IoFactory<D, P, V> setBasePath(URI basePath) {
+        this.basePath = basePath;
         return this;
     }
 
-    public IoFactory<D, P, V> withServletContextRoot(URI contextRoot) {
-        this.basePath = contextRoot;
+    public IoFactory<D, P, V> setDataService(DataService<D> dataService) {
+        this.dataService = dataService;
         return this;
     }
 
-    public IoFactory<D, P, V> withDataService(DataService<D> service) {
-        this.dataService = service;
-        return this;
-    }
-
-    public IoFactory<D, P, V> withDatasetService(ParameterService<P> service) {
-        this.datasetService = service;
-        return this;
-    }
-
-    public IoFactory<D, P, V> withBasePath(URI path) {
-        this.basePath = path;
+    public IoFactory<D, P, V> setDatasetService(ParameterService<P> datasetService) {
+        this.datasetService = datasetService;
         return this;
     }
 
@@ -95,13 +87,15 @@ public abstract class IoFactory<D extends Data<V>, P extends DatasetOutput<V, ?>
 
             @Override
             public DataCollection<D> getData() {
-                return getDataService().getData(getRequestParameters());
+                return getDataService().getData(parameters);
             }
 
             @Override
-            public DataCollection<?> getProcessedData() {
-                // empty chain
-                return getData();
+            public DataCollection< ? > getProcessedData() {
+                return parameters.shallClassifyByResultTimes()
+                        ? new ResultTimeFormatter<D>().format(getData())
+                        // empty chain
+                        : getData();
             }
         };
     }
@@ -111,33 +105,24 @@ public abstract class IoFactory<D extends Data<V>, P extends DatasetOutput<V, ?>
     public abstract Set<String> getSupportedMimeTypes();
 
     protected IoStyleContext createContext() {
-        if (datasetService == null || styledRequest == null) {
+        if (datasetService == null || !parameters.hasStyles()) {
             return IoStyleContext.createEmpty();
         }
-        return IoStyleContext.createContextWith(styledRequest, getMetadatas());
+        return IoStyleContext.createContextWith(parameters, getMetadatas());
     }
 
     protected List<P> getMetadatas() {
-        String[] seriesIds = simpleRequest != null
-                ? simpleRequest.getDatasets()
-                : styledRequest.getDatasets();
-        return datasetService.getParameters(seriesIds, getParameters()).getItems();
+        String[] datasetIds = parameters.getDatasets().toArray(new String[0]);
+        return datasetService.getParameters(datasetIds, parameters)
+                             .getItems();
     }
 
     protected IoParameters getParameters() {
-        return simpleRequest != null
-                ? IoParameters.createFromQuery(simpleRequest)
-                : IoParameters.createFromQuery(styledRequest);
+        return parameters;
     }
 
     protected DataService<D> getDataService() {
         return dataService;
-    }
-
-    public RequestParameterSet getRequestParameters() {
-        return simpleRequest == null
-                ? styledRequest
-                : simpleRequest;
     }
 
     public URI getBasePath() {

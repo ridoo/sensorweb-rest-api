@@ -2371,7 +2371,9 @@ components:
         `crs` parameter if a  non-default CRS shall be used.
 
 
-        ```json near={
+        ```
+        
+        near={
           "center": {
             "type": "Point",
             "coordinates": [x,y]

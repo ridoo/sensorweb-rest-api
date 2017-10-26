@@ -31,9 +31,9 @@ $icon-font-path: "{{ site.baseurl }}/assets/fonts/bootstrap/";
     position: fixed;
   }
 }
-@media (min-width: 1200px) {
+@media (min-width: 990px) {
   .n52-sidebar {
-      width: 400px;
+    padding-left:100px;
   }
 }
 
@@ -136,7 +136,6 @@ body {
 //  padding-top: 20px;
   border-right: 1px solid #eee;
   text-align: right;
-  width: inherit;
 }
 
 .n52-container {

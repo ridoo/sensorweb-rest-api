@@ -38,12 +38,11 @@ import static org.n52.io.geojson.old.GeojsonPoint.createWithCoordinates;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Point;
 import org.n52.io.geojson.old.GeojsonPoint;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.TransformException;
-
-import com.vividsolutions.jts.geom.Point;
 
 public class CRSUtilsTest {
 

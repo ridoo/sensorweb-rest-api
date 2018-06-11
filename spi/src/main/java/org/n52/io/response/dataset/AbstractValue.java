@@ -34,13 +34,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.locationtech.jts.geom.Geometry;
 import org.n52.io.geojson.GeoJSONGeometrySerializer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractValue<T> implements Comparable<AbstractValue<T>>, Serializable {
 

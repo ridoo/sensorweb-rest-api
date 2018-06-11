@@ -30,9 +30,8 @@ package org.n52.io.geojson;
 
 import java.util.Map;
 
+import org.locationtech.jts.geom.Geometry;
 import org.n52.io.response.OptionalOutput;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * TODO: JavaDoc

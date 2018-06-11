@@ -33,6 +33,13 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.CRS.AxisOrder;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.n52.io.geojson.old.GeojsonCrs;
 import org.n52.io.geojson.old.GeojsonPoint;
 import org.opengis.referencing.FactoryException;
@@ -42,14 +49,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
 
 public final class CRSUtils {
 
@@ -269,7 +268,11 @@ public final class CRSUtils {
 
     private Geometry transform(Geometry geometry, CoordinateReferenceSystem srs,
             CoordinateReferenceSystem dest) throws FactoryException, TransformException {
-        return JTS.transform(geometry, CRS.findMathTransform(srs, dest));
+
+        // TODO currently geotools only supports JTS 14
+
+        com.vividsolutions.jts.geom.Geometry toTransform = JTSGeometryConverter.convert(geometry);
+        return JTSGeometryConverter.convert(JTS.transform(toTransform, CRS.findMathTransform(srs, dest)));
     }
 
     public Geometry parseWkt(String wkt) {

@@ -30,7 +30,7 @@ package org.n52.io.crs;
 
 import java.io.Serializable;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 public class BoundingBox implements Serializable {
 

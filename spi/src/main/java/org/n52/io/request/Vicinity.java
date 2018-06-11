@@ -28,7 +28,7 @@
  */
 package org.n52.io.request;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 import org.n52.io.crs.BoundingBox;
 import org.n52.io.crs.CRSUtils;
 import org.n52.io.crs.WGS84Util;

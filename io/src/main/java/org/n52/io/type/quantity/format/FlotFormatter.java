@@ -32,13 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.n52.io.format.DataFormatter;
 import org.n52.io.response.dataset.Data;
 import org.n52.io.response.dataset.DataCollection;
 import org.n52.io.response.dataset.DatasetMetadata;
 import org.n52.io.response.dataset.quantity.QuantityValue;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class FlotFormatter implements DataFormatter<Data<QuantityValue>, FlotData> {
 

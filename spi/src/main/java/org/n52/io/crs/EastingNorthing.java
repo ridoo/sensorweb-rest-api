@@ -29,6 +29,7 @@
 package org.n52.io.crs;
 
 import java.io.Serializable;
+
 import org.n52.io.geojson.old.GeojsonCrs;
 import org.n52.io.geojson.old.GeojsonPoint;
 

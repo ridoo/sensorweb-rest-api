@@ -26,16 +26,16 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
+
 package org.n52.io.crs;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class GeotoolsJTSReferenceTester {
 
@@ -58,7 +58,8 @@ public class GeotoolsJTSReferenceTester {
         GeometryFactory strictFactory = respectEpsgOrder.createGeometryFactory("EPSG:4326");
         Point strictPoint = strictFactory.createPoint(new Coordinate(52.3, 7.4));
         LOGGER.info("EPSG:4326 as JTS point (strict EPSG order): {}", strictPoint);
-        LOGGER.info("Transformed to EPSG:25832: {}", respectEpsgOrder.transform(strictPoint, "EPSG:4326", "EPSG:25832"));
+        LOGGER.info("Transformed to EPSG:25832: {}",
+                    respectEpsgOrder.transform(strictPoint, "EPSG:4326", "EPSG:25832"));
     }
 
     @Test
